@@ -1,0 +1,26 @@
+public class Statistics {
+	private double waitingTime = 0;
+	private int numberServed = 0;
+	private int numberLeft = 0;
+
+	public Statistics() {
+	}
+
+	public void addTime(double time) {
+		waitingTime += time;
+	}
+
+	public void addServed(int number) {
+		numberServed += number;
+	}
+
+	public void addLeft(int number) {
+		numberLeft += number;
+	}
+
+	@Override
+	public String toString() {
+		double avg = waitingTime / numberServed;
+		return String.format("[%.3f %s %s]", avg, numberServed, numberLeft);
+	}
+}

@@ -1,0 +1,114 @@
+import java.util.PriorityQueue;
+import java.util.Iterator;
+
+/** 
+ * Class to simulate the server, who handles the change of customer states
+ * when serving customer.
+ */
+public class Server {
+    /**
+	 * Server has a PriorityQueue to store the customers,
+	 * a Statistics object to keep track of data of customers.
+	 * booleans to keep track of whether
+	 * it is serving or it has a customer waiting. 
+	 * When false, it is not serving/not waiting any customers.
+	 */
+    private PriorityQueue<Customer> queue;
+    private Statistics stats = new Statistics();
+    private boolean serving;
+    private boolean waiting;
+
+    public Server(PriorityQueue<Customer> queue) {
+        this.queue = queue;
+        this.serving = false;
+        this.waiting = false;
+    }
+	
+    /**
+	 * When server is done serving, it will immediately serve the waiting customer.
+	 * Hence, update the serving to occupied(true) and waiting to unoccupied(false).
+	 */
+	
+    public void reset() {
+        this.serving = false;
+        this.waiting = false;
+    }
+
+    /**
+	 * It has a boolean canServe() and canWait() to check whether
+	 * the server can serve or have a waiting slot for customers.
+	 * If server can, the method would also update the 
+	 * serving/waiting to true, which means Server is occupied.
+	 */
+
+    public boolean canServe() {
+        if (serving == false) {
+            this.serving = true;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean canWait() {
+        if (waiting == false) {
+            this.waiting = true;
+            return true;
+        } else {
+            return false;
+        }
+    }
+	
+    /**
+	 * Process of server dealing with the list of arriving customers. 
+	 * This process is split into few stages.
+	 * 1) Server starts doing a service by first polling a priority customer from the priority queue. 
+	 * 2) Information of the customer printed to signal the start of processing it.
+	 * 3) Depending on the state of the priority customer, they would be assigned to another state which comes after.
+	 * If applicable, statistics will also be updated accordingly.
+	 * 4) After creating a new customer, which contains the same customer's information but with a different state,
+	 * the customer will be added back to the PriorityQueue.
+	 * 5) Print the statistics after the PriorityQueue is empty.
+	 */
+    public void doService() {
+        double nextTime = 0;
+        while (!queue.isEmpty()) {
+            Customer firstCustomer = queue.poll(); 
+            System.out.println(firstCustomer);
+
+            if (firstCustomer.getState() == State.ARRIVES) {
+                if (canServe() && firstCustomer.getArrivalTime() >= nextTime) {
+                    nextTime = firstCustomer.getArrivalTime() + 1.0; 
+                    firstCustomer = new Customer(firstCustomer.getID(), firstCustomer.getArrivalTime(), State.SERVED);
+                    queue.add(firstCustomer);
+                } else if (canServe() == false && canWait()) {
+                    firstCustomer = new Customer(firstCustomer.getID(), firstCustomer.getArrivalTime(), State.WAITS);
+                    queue.add(firstCustomer);
+                } else {
+                    firstCustomer = new Customer(firstCustomer.getID(), firstCustomer.getArrivalTime(), State.LEAVES);
+                    stats.addLeft();
+                    queue.add(firstCustomer);
+                }
+            } else if (firstCustomer.getState() == State.SERVED) {
+                firstCustomer = new Customer(firstCustomer.getID(), nextTime, State.DONE);
+                queue.add(firstCustomer);
+            } else if (firstCustomer.getState() == State.WAITS) {
+                double duration = nextTime - firstCustomer.getArrivalTime();
+                stats.addTime(duration);
+                firstCustomer = new Customer(firstCustomer.getID(), nextTime, State.SERVED);
+                nextTime = nextTime + 1.0;
+                queue.add(firstCustomer);
+            } else if (firstCustomer.getState() == State.DONE) {
+                stats.addServed();
+                reset();
+            }
+        }
+    System.out.println(stats);
+    }
+
+}
+				
+
+
+
+

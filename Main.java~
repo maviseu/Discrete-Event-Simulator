@@ -1,0 +1,30 @@
+import java.util.Scanner;
+import java.util.PriorityQueue;
+
+/** 
+ * Main class to take in inputs.
+ */
+class Main {
+	 /** 
+	 * Has a scanner object to take in a list of arrival times.
+	 * It creates a priority queue, and adds arriving customers to it.
+	 * It then creates a serve to activate doService(), to stimulate the execution
+	 * of activities.
+	 * @param args the inputs of user
+	 */
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int counter = 0;
+        PriorityQueue<Customer> pq = new PriorityQueue<>(new MyComparator());
+        while (sc.hasNextDouble()) {
+            Customer customer = new Customer(counter + 1, sc.nextDouble(), State.ARRIVES);
+            pq.add(customer);
+            counter++; 
+        }
+
+        sc.close();
+        Server server = new Server(pq);
+        server.doService();
+    }
+}
+

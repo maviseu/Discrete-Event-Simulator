@@ -1,0 +1,46 @@
+/** 
+ *Customer class for keeping customer's information.
+ */
+public class Customer {
+    /**
+	 * Each customer has an unique customer ID,
+	 * the time they arrive and
+	 * the state they are currently in.
+	 */
+    private int customerID; 
+    private final double arrivalTime;
+    private State state;
+	
+    /**
+	 * Creates a customer object.
+	 * @param customerID unique customer ID
+	 * @param arrivalTime the time they arrive
+	 * @param state the state of customer 
+	 */
+    public Customer(int customerID, double arrivalTime, State state) {
+        this.customerID = customerID;
+        this.arrivalTime = arrivalTime;
+        this.state = state;
+    }
+
+    public int getID() {
+        return this.customerID;
+    }
+
+    public double getArrivalTime() {
+        return this.arrivalTime;
+    }
+
+    public State getState() {
+        return this.state;
+    }
+
+    /**
+	 * Override the toString() method in object.
+	 */
+    @Override
+    public String toString() {
+        return String.format("%.3f %s %s", getArrivalTime(), getID(), getState());
+    }
+}
+
